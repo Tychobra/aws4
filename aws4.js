@@ -11,8 +11,21 @@ function hmac(key, string, encoding) {
   return crypto.createHmac('sha256', key).update(string, 'utf8').digest(encoding)
 }
 
+const chunk_size = 1024 * 1024 * 5
 function hash(string, encoding) {
-  return crypto.createHash('sha256').update(string, 'utf8').digest(encoding)
+  const hash = crypto.createHash('sha256')
+  
+  if (string.length > chunk_size) {
+    let i = 0
+    while (i < string.length) {
+      hash.update(string.slice(i, i + chunk_size))
+      i += chunk_size
+    }
+  } else {
+    hash.update(string)
+  }
+  
+  return hash.digest(encoding)
 }
 
 // This function assumes the string has already been percent encoded
